@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class doublecha
+public class Quadratic_Equation
 {
 	public static void main(String[] args)
 	{
