@@ -1,3 +1,0 @@
-a.out
-file.txt
-proc.c

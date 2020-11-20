@@ -1,4 +1,5 @@
 #include  <stdio.h>
+#include  <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include  <errno.h>
@@ -19,7 +20,15 @@ int main()
       fgets(cmdlines, 99, stdin);
       cmdlines[strlen(cmdlines) - 1] = '\0';
       if (strcmp(cmdlines, "quit") == 0)
-         break;
+	  {
+		printf("201721207 의학공학전공 이승현\n");
+		  time_t t = time(NULL);
+		  struct tm tm = *localtime(&t);
+  printf("현재시간: %d-%d-%d %d:%d:%d\n",
+         tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,
+         tm.tm_hour, tm.tm_min, tm.tm_sec);
+		break;
+		}
       cmd_proc(cmdlines, "&", cmd_list);
       cmd_proc(cmdlines, ";",cmd_list);
         for(j=0; cmd_list[j] !=NULL ; j++){
