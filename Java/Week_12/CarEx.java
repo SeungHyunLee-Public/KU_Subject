@@ -46,8 +46,6 @@ class DumpTruck extends Convertible
 	public  DumpTruck(String color, int cargoSize)
 	{
 		super(color);
-		this.color = color;
-		speed = 0;
 		this.cargoSize = cargoSize;
 	}
 	public void dump()
@@ -64,8 +62,6 @@ class FreezerTruck extends Convertible
 	public FreezerTruck(String color, int cargoSize, int temp)
 	{
 		super(color);
-		this.color = color;
-		speed = 0;
 		this.cargoSize = cargoSize;
 		temperature = temp;
 	}
