@@ -12,14 +12,15 @@
 #include <signal.h>
 
 void cmd_proc(char *cmdline, char *delim, char *cmd[]);
-
+int pid;
+void	intHandler();
 int main()
 {
    char cmdline[500];
-   char *cmds[100], *args[100], *ptr, *red_in, *red_out;
-    int j, status, pid, bg, fd, fd1;
+   char *cmds[100], *args[100], *ptr, *red_in, *red_out, *tmp[2];
+    int j, status, bg, fd, fd1;
 	signal(SIGCHLD, SIG_IGN);
-	signal(SIGINT, SIG_IGN);
+	signal(SIGINT, intHandler);
 	while (1)
 	{
 		printf("[명령입력]: ");
@@ -40,6 +41,12 @@ int main()
 		for(j=0; cmds[j] !=NULL ; j++)
 		{
 			bg = 0; red_in = NULL; red_out = NULL;
+			if ((ptr = strchr(cmds[j], '|')))
+			{
+				*ptr = '\0';
+				cmd_proc(ptr + 1, " ", tmp);
+				red_in = tmp[0];
+			}
 			if ((ptr = strchr(cmds[j], '&')))
 			{
 				bg = 1;
@@ -48,12 +55,14 @@ int main()
 			if ((ptr = strchr(cmds[j], '<')))
 			{
 				*ptr = '\0';
-				cmd_proc(ptr + 1, " ", &red_in);
+				cmd_proc(ptr + 1, " ", tmp);
+				red_in = tmp[0];
 			}
 			if ((ptr = strchr(cmds[j], '>')))
 			{
 				*ptr = '\0';
-				cmd_proc(ptr + 1, " ", &red_out);
+				cmd_proc(ptr + 1, " ", tmp);
+				red_in = tmp[0];
 			}
 		//printf("red_in = [%s], red_out = [%s]\n", red_in, red_out);
 			cmd_proc(cmds[j], " ", args);
@@ -86,6 +95,15 @@ int main()
 	}
 }
 
+void	intHandler()
+{
+	if (getpid() != pid)
+	{
+		kill(pid, SIGTERM);
+		signal(SIGINT, intHandler);
+	}
+}
+		
 void cmd_proc(char *cmdline, char *delim, char *cmds[])
 {
    char *str1, *token;
@@ -99,23 +117,3 @@ void cmd_proc(char *cmdline, char *delim, char *cmds[])
 			break;
 	}
 }
-
-//int mysystem(const char *cmdstring)
-//{
- //  int pid, status;
-//
- //  if (cmdstring == NULL)
-///     return 1;            /* 명령어가 NULL인 경우 */
-//  if ((pid = fork()) == 0) {
-//      execl("/bin/sh", "sh", "-c", cmdstring, (char *) 0);
-//      _exit(127);            /* 명령어 실행 오류 */
-//   } else if (pid == -1)
-//      return -1;            /* 프로세스 생성 실패 */
-//   do {
-//      if (waitpid(pid, &status, 0) == -1) {
-//         if (errno != EINTR)   /* waitpid()로부터 EINTR 오류 외 */
-//            return -1;
-//      } else
-//         return status;
-//   } while (1);
-//}	

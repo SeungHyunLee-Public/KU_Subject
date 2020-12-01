@@ -15,8 +15,10 @@ int main()
    char cmdlines[100];
    char *cmd_list[100];
     int j;
+	signal(SIGCHLD, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
    while (1) {
-      printf("[shell]");
+      printf("[명령입력]");
       fflush(stdout);
       fgets(cmdlines, 99, stdin);
       cmdlines[strlen(cmdlines) - 1] = '\0';
@@ -30,7 +32,6 @@ int main()
          tm.tm_hour, tm.tm_min, tm.tm_sec);
 		break;
 		}
-      cmd_proc(cmdlines, "&", cmd_list);
       cmd_proc(cmdlines, ";",cmd_list);
         for(j=0; cmd_list[j] !=NULL ; j++){
          mysystem(cmd_list[j]);
@@ -43,8 +44,8 @@ int main()
 
 int cmd_proc(char *cmdlines, char *delim,char *cmd_list[])
 {
-   char *str1, *str2, *token, *subtoken;
-   char *saveptr1, *saveptr2;
+   char *str1, *token;
+   char *saveptr1;
    int j;
    for (j = 0, str1 = cmdlines;; j++, str1 = NULL) {
       token = strtok_r(str1, delim, &saveptr1);
@@ -59,20 +60,20 @@ int cmd_proc(char *cmdlines, char *delim,char *cmd_list[])
 
 
 
-int mysystem(const char *cmdstring)
+ int mysystem(const char *cmdstring)
 {
    int pid, status;
 
-   if (cmdstring == NULL)
-      return 1;            /* 명령어가 NULL인 경우 */
+  if (cmdstring == NULL)
+      return 1;            
    if ((pid = fork()) == 0) {
       execl("/bin/sh", "sh", "-c", cmdstring, (char *) 0);
-      _exit(127);            /* 명령어 실행 오류 */
+      _exit(127);           
    } else if (pid == -1)
-      return -1;            /* 프로세스 생성 실패 */
+      return -1;        
    do {
       if (waitpid(pid, &status, 0) == -1) {
-         if (errno != EINTR)   /* waitpid()로부터 EINTR 오류 외 */
+         if (errno != EINTR)   
             return -1;
       } else
          return status;
